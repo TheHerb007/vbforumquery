@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import queryRoutes from './routes/query';
 import healthRoutes from './routes/health';
 import { closePool } from './db/connection';
+import { apiKeyAuth } from './middleware/apiKey';
 
 // Load environment variables
 dotenv.config();
@@ -15,9 +16,9 @@ const PORT = parseInt(process.env.PORT || '3000', 10);
 app.use(cors());
 app.use(express.json());
 
-// Routes
-app.use('/api/query', queryRoutes);
-app.use('/api/health', healthRoutes);
+// Routes (protected by API key)
+app.use('/api/query', apiKeyAuth, queryRoutes);
+app.use('/api/health', apiKeyAuth, healthRoutes);
 
 // Root endpoint
 app.get('/', (_req, res) => {
