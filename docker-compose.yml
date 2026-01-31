@@ -3,6 +3,6 @@ services:
     build: .
     ports:
       - "${PORT:-3096}:3096"
-    #env_file:
-    #  - .env
+    env_file:
+      - .env
     restart: unless-stopped
