@@ -62,11 +62,12 @@ router.get('/search', apiKeyAuth, async (req: Request, res: Response) => {
     // Search posts
     const postsQuery = `
       SELECT
-        t.topic_title, f.forum_name, p.post_subject, p.post_text, p.forum_id
+        t.topic_title, f.forum_name, p.post_subject, p.post_text, p.forum_id, p.topic_id
       FROM phpbb_posts p
       JOIN phpbb_topics t ON p.topic_id = t.topic_id
       JOIN phpbb_forums f ON p.forum_id = f.forum_id
       WHERE p.post_visibility = 1
+        AND p.forum_id NOT IN (197, 196, 192, 149, 150)
         AND (p.post_subject LIKE ? OR p.post_text LIKE ?)
       ORDER BY p.post_time DESC
       LIMIT ? OFFSET ?
@@ -77,11 +78,17 @@ router.get('/search', apiKeyAuth, async (req: Request, res: Response) => {
       query<Array<Record<string, unknown>>>(postsQuery, [searchPattern, searchPattern, limit, offset]),
     ]);
 
+    // Add URL to each post
+    const postsWithUrls = posts.map(post => ({
+      ...post,
+      url: `https://valkurianblades.info/viewtopic.php?t=${post.topic_id}`,
+    }));
+
     res.json({
       success: true,
       query: q,
       data: {
-        posts,
+        posts: postsWithUrls,
       },
       pagination: {
         limit,
