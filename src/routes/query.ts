@@ -74,8 +74,8 @@ router.get('/search', async (req: Request, res: Response) => {
       LIMIT ? OFFSET ?
     `;
 
-    const [topics, posts] = await Promise.all([
-      query<Array<Record<string, unknown>>>(topicsQuery, [searchPattern, limit, offset]),
+    const [/*topics,*/posts] = await Promise.all([
+      //query<Array<Record<string, unknown>>>(topicsQuery, [searchPattern, limit, offset]),
       query<Array<Record<string, unknown>>>(postsQuery, [searchPattern, searchPattern, limit, offset]),
     ]);
 
@@ -90,13 +90,13 @@ router.get('/search', async (req: Request, res: Response) => {
       success: true,
       query: q,
       data: {
-        topics: formatResults(topics, 'topic_time'),
+        //topics: formatResults(topics, 'topic_time'),
         posts: formatResults(posts, 'post_time'),
       },
       pagination: {
         limit,
         offset,
-        topic_count: topics.length,
+       // topic_count: topics.length,
         post_count: posts.length,
       },
     });
