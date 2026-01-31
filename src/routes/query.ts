@@ -61,14 +61,16 @@ router.get('/search', async (req: Request, res: Response) => {
     // Search posts
     const postsQuery = `
       SELECT
-        p.post_id, p.topic_id, t.topic_title, p.forum_id, f.forum_name,
-        p.post_username as author, p.post_subject,
-        SUBSTRING(p.post_text, 1, 200) as post_text_preview,
-        p.post_time
+        t.topic_title, f.forum_name,
+        p.poster_id, p.post_subject,
+        p.post_text,
+        p.post_edit_time, p.post_edit_count, p.post_edit_user,
+        p.bbcode_uid, p.bbcode_bitfield, p.enable_bbcode, p.enable_smilies
       FROM phpbb_posts p
       JOIN phpbb_topics t ON p.topic_id = t.topic_id
       JOIN phpbb_forums f ON p.forum_id = f.forum_id
       WHERE p.post_visibility = 1
+        AND f.forum_name = 'The Cargo Hold'
         AND (p.post_subject LIKE ? OR p.post_text LIKE ?)
       ORDER BY p.post_time DESC
       LIMIT ? OFFSET ?
@@ -79,19 +81,11 @@ router.get('/search', async (req: Request, res: Response) => {
       query<Array<Record<string, unknown>>>(postsQuery, [searchPattern, searchPattern, limit, offset]),
     ]);
 
-    // Convert Unix timestamps to ISO dates
-    const formatResults = (rows: Array<Record<string, unknown>>, timeField: string) =>
-      rows.map((row) => ({
-        ...row,
-        created_at: new Date((row[timeField] as number) * 1000).toISOString(),
-      }));
-
     res.json({
       success: true,
       query: q,
       data: {
-        //topics: formatResults(topics, 'topic_time'),
-        posts: formatResults(posts, 'post_time'),
+        posts,
       },
       pagination: {
         limit,
