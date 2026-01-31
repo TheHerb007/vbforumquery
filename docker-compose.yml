@@ -2,7 +2,12 @@ services:
   api:
     build: .
     ports:
-      - "${PORT:-3096}:3096"
-    env_file:
-      - .env
+      - "3096:3096"
+    environment:
+      - PORT=3096
+      - DB_HOST=192.168.1.15
+      - DB_PORT=3307
+      - DB_USER=eric
+      - DB_PASSWORD=VBQuery945!
+      - DB_NAME=valkurianbladesphpbb
     restart: unless-stopped
