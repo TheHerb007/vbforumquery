@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { query } from '../db/connection';
+import { apiKeyAuth, adminApiKeyAuth } from '../middleware/apiKey';
 
 const router = Router();
 
@@ -8,8 +9,8 @@ interface QueryRequest {
   params?: unknown[];
 }
 
-// Execute a query and return results
-router.post('/', async (req: Request, res: Response) => {
+// Execute a query and return results (admin only)
+router.post('/', adminApiKeyAuth, async (req: Request, res: Response) => {
   try {
     const { sql, params } = req.body as QueryRequest;
 
@@ -30,8 +31,8 @@ router.post('/', async (req: Request, res: Response) => {
   }
 });
 
-// Search topics and posts by keyword
-router.get('/search', async (req: Request, res: Response) => {
+// Search topics and posts by keyword (regular API keys allowed)
+router.get('/search', apiKeyAuth, async (req: Request, res: Response) => {
   try {
     const q = req.query.q as string;
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
@@ -95,8 +96,8 @@ router.get('/search', async (req: Request, res: Response) => {
   }
 });
 
-// Get list of tables in the database
-router.get('/tables', async (_req: Request, res: Response) => {
+// Get list of tables in the database (admin only)
+router.get('/tables', adminApiKeyAuth, async (_req: Request, res: Response) => {
   try {
     const results = await query<Array<{ Tables_in_database: string }>>(
       'SHOW TABLES'
@@ -111,8 +112,8 @@ router.get('/tables', async (_req: Request, res: Response) => {
   }
 });
 
-// Describe a specific table
-router.get('/tables/:tableName', async (req: Request, res: Response) => {
+// Describe a specific table (admin only)
+router.get('/tables/:tableName', adminApiKeyAuth, async (req: Request, res: Response) => {
   try {
     const { tableName } = req.params;
     const results = await query(`DESCRIBE \`${tableName}\``);

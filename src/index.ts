@@ -4,7 +4,8 @@ import dotenv from 'dotenv';
 import queryRoutes from './routes/query';
 import healthRoutes from './routes/health';
 import { closePool } from './db/connection';
-import { apiKeyAuth } from './middleware/apiKey';
+import { adminApiKeyAuth } from './middleware/apiKey';
+import { requestLogger } from './middleware/logger';
 
 // Load environment variables
 dotenv.config();
@@ -15,10 +16,11 @@ const PORT = parseInt(process.env.PORT || '3000', 10);
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(requestLogger);
 
-// Routes (protected by API key)
-app.use('/api/query', apiKeyAuth, queryRoutes);
-app.use('/api/health', apiKeyAuth, healthRoutes);
+// Routes (middleware applied per-route in route files)
+app.use('/api/query', queryRoutes);
+app.use('/api/health', adminApiKeyAuth, healthRoutes);
 
 // Root endpoint
 app.get('/', (_req, res) => {

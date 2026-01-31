@@ -10,6 +10,7 @@ dist/
 .env.*.local
 docker-compose.yml
 api-keys.txt
+admin-api-keys.txt
 
 # IDE
 .vscode/
