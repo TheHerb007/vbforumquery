@@ -27,12 +27,12 @@ app.get('/', (_req, res) => {
   res.json({
     name: 'vbforumquery',
     version: '1.0.0',
-    endpoints: {
+/*    endpoints: {
       health: '/api/health',
       query: '/api/query',
       tables: '/api/query/tables',
       describeTable: '/api/query/tables/:tableName',
-    },
+    },*/
   });
 });
 
