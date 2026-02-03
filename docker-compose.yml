@@ -10,6 +10,6 @@ services:
       - DB_USER=eric
       - DB_PASSWORD=VBQuery945!
       - DB_NAME=valkurianbladesphpbb
-      - API_KEYS=565e1153-7ee5-4b78-94df-9c446fe3ca19,8ad272b1-317c-480f-9c58-2c4efc0b69a3,fc988240-9778-479e-be84-bdef41e17da4
+      - API_KEYS=565e1153-7ee5-4b78-94df-9c446fe3ca19,8ad272b1-317c-480f-9c58-2c4efc0b69a3,fc988240-9778-479e-be84-bdef41e17da4,9faa25aa-5ba5-4b66-98be-e625ef40bac3
       - ADMIN_API_KEYS=4ede5ad5-9669-44e9-9feb-ce5acac7a513
     restart: unless-stopped
