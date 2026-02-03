@@ -13,6 +13,9 @@ dotenv.config();
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
 
+// Trust proxy headers (X-Forwarded-For) for correct client IP in Docker/reverse proxy
+app.set('trust proxy', true);
+
 // Middleware
 app.use(cors());
 app.use(express.json());
