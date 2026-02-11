@@ -44,6 +44,13 @@ router.get('/search', apiKeyAuth, async (req: Request, res: Response) => {
     }
 
     const searchPattern = `%${q}%`;
+    // Also search with HTML entities for characters phpBB encodes
+    const htmlEncodedQ = q
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+    const htmlSearchPattern = htmlEncodedQ !== q ? `%${htmlEncodedQ}%` : null;
 
     // Search topics
     const topicsQuery = `
@@ -59,8 +66,21 @@ router.get('/search', apiKeyAuth, async (req: Request, res: Response) => {
       LIMIT ? OFFSET ?
     `;
 
-    // Search posts
-    const postsQuery = `
+    // Search posts (also search HTML-encoded version for special characters)
+    const postsQuery = htmlSearchPattern
+      ? `
+      SELECT
+        t.topic_title, f.forum_name, p.post_subject, p.post_text, p.forum_id, p.topic_id
+      FROM phpbb_posts p
+      JOIN phpbb_topics t ON p.topic_id = t.topic_id
+      JOIN phpbb_forums f ON p.forum_id = f.forum_id
+      WHERE p.post_visibility = 1
+        AND p.forum_id NOT IN (197, 196, 192, 149, 150)
+        AND (p.post_subject LIKE ? OR p.post_text LIKE ? OR p.post_text LIKE ?)
+      ORDER BY p.post_time DESC
+      LIMIT ? OFFSET ?
+    `
+      : `
       SELECT
         t.topic_title, f.forum_name, p.post_subject, p.post_text, p.forum_id, p.topic_id
       FROM phpbb_posts p
@@ -73,9 +93,13 @@ router.get('/search', apiKeyAuth, async (req: Request, res: Response) => {
       LIMIT ? OFFSET ?
     `;
 
+    const postsParams = htmlSearchPattern
+      ? [searchPattern, searchPattern, htmlSearchPattern, limit, offset]
+      : [searchPattern, searchPattern, limit, offset];
+
     const [/*topics,*/posts] = await Promise.all([
       //query<Array<Record<string, unknown>>>(topicsQuery, [searchPattern, limit, offset]),
-      query<Array<Record<string, unknown>>>(postsQuery, [searchPattern, searchPattern, limit, offset]),
+      query<Array<Record<string, unknown>>>(postsQuery, postsParams),
     ]);
 
     // Add URL to each post
