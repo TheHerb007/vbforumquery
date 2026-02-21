@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import queryRoutes from './routes/query';
 import healthRoutes from './routes/health';
+import zonequeryRoutes from './routes/zonequery';
 import { closePool } from './db/connection';
 import { adminApiKeyAuth } from './middleware/apiKey';
 import { requestLogger } from './middleware/logger';
@@ -23,6 +24,7 @@ app.use(requestLogger);
 
 // Routes (middleware applied per-route in route files)
 app.use('/api/query', queryRoutes);
+app.use('/api/zonequery', zonequeryRoutes);
 app.use('/api/health', adminApiKeyAuth, healthRoutes);
 
 // Root endpoint
