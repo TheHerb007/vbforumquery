@@ -8,7 +8,7 @@ const router = Router();
 router.get('/search', apiKeyAuth, async (req: Request, res: Response) => {
   try {
     const q = req.query.q as string;
-    const limit = Math.min(parseInt(req.query.limit as string) || 200, 200);
+    const limit = Math.min(parseInt(req.query.limit as string) || 300, 300);
     const offset = parseInt(req.query.offset as string) || 0;
 
     if (!q || q.trim().length === 0) {
